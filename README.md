@@ -71,5 +71,4 @@ MIT License © 2025 Shriyans Nayak
 ## 📬 Author
 
 **Shriyans Nayak**
-Email: [youremail@example.com](mailto:youremail@example.com)
-GitHub: [https://github.com/shriyansnayak](https://github.com/shriyansnayak)
+
