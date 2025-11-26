@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "codeprinter2"
+version = "0.2.3"
+description = "Lightweight package to store and retrieve code answers by program number."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{ name = "Shriyans Nayak", email = "youremail@example.com" }]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/shriyansnayak/codeprinter"
+Repository = "https://github.com/shriyansnayak/codeprinter"
+
+[tool.hatch.build.targets.wheel]
+packages = ["codeprinter"]
