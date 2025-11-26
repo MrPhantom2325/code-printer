@@ -7,7 +7,7 @@ Tiny utility package for keeping your lab solutions in one place and importing t
 Once published to PyPI, you (or anyone) can install it globally using:
 
 ```bash
-pip install codeprinter
+pip install codeprinter2
 ```
 
 This will automatically install the latest version of the package from PyPI, so it can be used from any project or environment.
