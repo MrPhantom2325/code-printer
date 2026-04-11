@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "codeprinter2"
-version = "0.2.4"
+version = "0.3.0"
 description = "Lightweight package to store and retrieve code answers by program number."
 readme = "README.md"
 license = {text = "MIT"}
-authors = [{ name = "Shriyans Nayak", email = "youremail@example.com" }]
+authors = [{ name = "Shriyans Nayak", email = "shriyans.nayakhd12@gmail.com" }]
 requires-python = ">=3.8"
 dependencies = []
 

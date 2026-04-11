@@ -9,620 +9,429 @@ Answer = Union[str, int, float, dict[str, Any], list[Any], Callable[[], Any]]
 
 ANSWERS: dict[int, Answer] = {
     1: ('''Question 1:
-Create and implement a basic neuron model within a computational framework.
-Integrate essential elements like input nodes, weight parameters, bias, and an
-activation function (including but not limited to sigmoid, hyperbolic tangent, and
-Rectified Linear Unit (ReLU)) to construct a comprehensive representation of a
-neuron. Evaluate and observe how each activation function influences the network's
-behaviour and effectiveness in handling different types of data.
+Implementation of Fuzzy Logic System
 
 Answer 1:
-#Lab-01
 import numpy as np
-import matplotlib.pyplot as plt
-class Neuron:
-  def __init__(self, input_size):
-    self.weights = np.random.rand(input_size)
-    self.bias = np.random.rand()
-  
-  def sigmoid(self, x):
-      return 1 / (1 + np.exp(-x))
-  def tanh(self, x):  
-      return np.tanh(x)
-  def relu(self, x):
-      return np.maximum(0,x)
-  def softmax(self, x):   
-      return np.exp(x)/np.sum(np.exp(x))
-  
-  def forward(self, inputs):
-      z = np.dot(inputs, self.weights) + self.bias
-      return self.sigmoid(z)
 
-input_size = 5
-inputs = np.random.rand(10, input_size) 
-neuron = Neuron(input_size)
-for i in range(len(inputs)):
-  print(f"Output {i}: {neuron.forward(inputs[i])}")
+R = {
+    "Low Temp": np.array([0.8, 0.5, 0.3]),
+    "Medium Temp": np.array([0.6, 0.7, 0.4]),
+    "High Temp": np.array([0.3, 0.6, 0.9])
+}
 
-#Sigmoid graph
-x = np.linspace(-10, 10, 100)
-sigmoid_values = neuron.sigmoid(x)
-plt.plot(x, sigmoid_values)
-plt.title('Sigmoid Activation Function')
-plt.xlabel('Input')
-plt.ylabel('Output')
-plt.legend()
-plt.grid(True)
-plt.show()
+S = {
+    "Dry": np.array([0.7, 0.4, 0.3]),
+    "Normal": np.array([0.5, 0.6, 0.4]),
+    "Humid": np.array([0.2, 0.5, 0.8])
+}
 
-#Hyperbolic tan graph
-t = np.linspace(-5, 5,1000)
-hyperbolictanh_values = neuron.tanh(t)
-plt.plot(t, hyperbolictanh_values, )
-plt.title('Hyperbolic Tan Activation Function')
-plt.xlabel('Input')
-plt.ylabel('Output')
-plt.legend()
-plt.grid(True)
-plt.show()
+temperature_input = "Low Temp"
+humidity_input = "Dry"
 
-#Relu graph
-r = np.linspace(-5,5)
-relu_values = neuron.relu(r)
-plt.plot(r, relu_values)
-plt.title('Relu Activation Function')
-plt.xlabel('Input')
-plt.ylabel('Output')
-plt.legend()
-plt.grid(True)
-plt.show()
+mu_R = R[temperature_input]
+mu_S = S[humidity_input]
 
-#Softmax graph
-s = np.linspace(-5,5)
-softmax_values = neuron.softmax(s)
-plt.plot(s, softmax_values)
-plt.title('Softmax Activation Function')
-plt.xlabel('Input')
-plt.ylabel('Output')
-plt.legend()
-plt.grid(True)
-plt.show()
+composed_result = np.minimum(mu_R, mu_S)
+
+cooling_action = ["Low Cooling", "Medium Cooling", "High Cooling"]
+action_index = np.argmax(composed_result)
+
+print("Composed Membership:", composed_result)
+print("Selected Action:", cooling_action[action_index])
 
 '''),
     2: ('''Question 2:
-Develop and implement a program to execute the perceptron learning algorithm,
-customized to train a single-layer perceptron for binary classification tasks. create a
-robust algorithm that refines the model's weights iteratively, resulting in a proficient
-single-layer perceptron capable of effectively handling binary classification
-challenges.
+Implementation of Defuzzification
 
 Answer 2:
-#LAB-02
-import numpy as np
-class Perceptron:
-  def __init__(self, learning_rate=0.01, epochs=100):
-    self.lr = learning_rate
-    self.epochs = epochs
-    self.weights = None
-    self.bias = 0
-  def fit(self, X, y):
-    self.weights = np.zeros(X.shape[1])
 
-    for epoch in range(self.epochs):
-      for i in range(X.shape[0]):
-        linear_output = np.dot(X[i], self.weights) + self.bias
-        y_pred = 1 if linear_output >= 0 else 0
+fuzzy_set = {1: 0.2, 2: 0.5, 3: 0.8, 4: 1.0, 5: 1.0, 6: 0.7, 7: 0.3}
 
-        error = y[i] - y_pred
+# 1. Lambda Cut
+def lambda_cut(fs, lam):
+    return [x for x, mu in fs.items() if mu >= lam]
 
-        self.weights += self.lr * error * X[i]
-        self.bias += self.lr * error
-        print(f'Epoch {epoch+1}, Sample {i+1}: Weights: {self.weights}, Bias: {self.bias}')
+# 2. Mean of Maximum (MOM)
+def mom(fs):
+    max_mu = max(fs.values())
+    return sum(x for x, mu in fs.items() if mu == max_mu) / \
+           len([1 for mu in fs.values() if mu == max_mu])
 
-  def predict(self, x):
-      linear_output = np.dot(x, self.weights) + self.bias
-      return 1 if linear_output >= 0 else 0
+# 3. Center of Gravity (COG)
+def cog(fs):
+    num = sum(x * mu for x, mu in fs.items())
+    den = sum(fs.values())
+    return num / den if den != 0 else 0
 
-X_train = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_train = np.array([0, 0, 0, 1])
-
-print("Training Perceptron on AND Gate...")
-model = Perceptron(learning_rate=0.1, epochs=10)
-model.fit(X_train, y_train)
-
-test_point = np.array([1, 1])
-prediction = model.predict(test_point)
-print(f"\nPrediction for {test_point}: {prediction}")
-
+print("Lambda Cut:", lambda_cut(fuzzy_set, 0.8))
+print("MOM:", mom(fuzzy_set))
+print("COG:", cog(fuzzy_set))
 '''),
     3:('''
 Question 3:
-Implement a program aimed at constructing and training a multilayer perceptron
-tailored for a specific task, showcasing the execution of the backpropagation
-algorithm. Construct a network with a linear input layer, Tanh or ReLU activation for
-the hidden layers, and sigmoid or SoftMax activation for the output layer.
+Implementation of Ant Colony Optimization
 
 Answer 3:
+import numpy as np
+import random
 
-#LAb-03
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-
-iris = load_iris()
-X = iris.data
-y = iris.target
-
-X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.2, random_state=42)
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
-
-model = Sequential([
-  Dense(64, activation='relu', input_shape=(4,)),
-  Dense(32, activation='relu'),
-  Dense(3, activation='softmax')
+dist = np.array([
+    [0, 2, 9, 10],
+    [1, 0, 6, 4],
+    [15, 7, 0, 8],
+    [6, 3, 12, 0]
 ])
 
-model.compile(optimizer='adam',loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-print("Training MLP...")
-history = model.fit(X_train, y_train, epochs=50, validation_split=0.1,verbose=0)
+n = len(dist)
 
-loss, accuracy = model.evaluate(X_test, y_test)
-print(f"Test Accuracy: {accuracy}")
+ants = 5
+iterations = 50
+alpha = 1
+beta = 2
+evap = 0.5
 
-plt.plot(history.history['accuracy'], label='Train Accuracy')
-plt.plot(history.history['val_accuracy'], label='Val Accuracy')
-plt.title('Model Accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.show()
+pheromone = np.ones((n, n))
 
-plt.plot(history.history['loss'], label='Train Loss')
-plt.plot(history.history['val_loss'], label='Val Loss')
-plt.title('Model Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
+def choose_next(curr, visited):
+    probs = []
+    for j in range(n):
+        if j not in visited:
+            tau = pheromone[curr][j] ** alpha
+            eta = (1 / dist[curr][j]) ** beta
+            probs.append(tau * eta)
+        else:
+            probs.append(0)
+
+    probs = np.array(probs)
+    probs = probs / probs.sum()
+    return np.random.choice(range(n), p=probs)
+
+def path_cost(path):
+    cost = 0
+    for i in range(len(path)-1):
+        cost += dist[path[i]][path[i+1]]
+    cost += dist[path[-1]][path[0]]
+    return cost
+
+best_path = None
+best_cost = float('inf')
+
+for _ in range(iterations):
+    all_paths = []
+
+    for _ in range(ants):
+        start = random.randint(0, n-1)
+        path = [start]
+
+        while len(path) < n:
+            next_city = choose_next(path[-1], path)
+            path.append(next_city)
+
+        cost = path_cost(path)
+        all_paths.append((path, cost))
+
+        if cost < best_cost:
+            best_cost = cost
+            best_path = path
+
+    pheromone *= (1 - evap)
+
+    for path, cost in all_paths:
+        for i in range(len(path)-1):
+            pheromone[path[i]][path[i+1]] += 1 / cost
+
+print("Best Path:", best_path)
+print("Best Cost:", best_cost)
     '''),
     4: ('''
 Question 4:
-Design a deep NN and optimize the network with Gradient Descent and optimize the
-same with Stochastic gradient descent (SGD).
-
+Implementation of Particle Swarm Optimization
 Answer 4:
+import numpy as np
 
-#Lab-04
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.optimizers import SGD
-import matplotlib.pyplot as plt
+def f(x):
+    return x**2   
 
-iris = load_iris()
-x=iris.data
-y=iris.target
-x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=42)
+particles = 5
+iterations = 50
+w = 0.5      
+c1 = 1      
+c2 = 1      
+        
+pos = np.random.uniform(-10, 10, particles)
+vel = np.zeros(particles)
 
-scaler=StandardScaler()
-x_train=scaler.fit_transform(x_train)
-x_test=scaler.transform(x_test)
+pbest = pos.copy()
+
+gbest = pbest[np.argmin(f(pbest))]
+        
+for _ in range(iterations):
+    for i in range(particles):
+        r1, r2 = np.random.rand(), np.random.rand()
+        vel[i] = (w * vel[i] +
+                  c1 * r1 * (pbest[i] - pos[i]) +
+                  c2 * r2 * (gbest - pos[i]))
+
+        pos[i] += vel[i]
+        if f(pos[i]) < f(pbest[i]):
+            pbest[i] = pos[i]
+        
+    gbest = pbest[np.argmin(f(pbest))]
 
 
-def run_experiment(batch_size, label_name):
-  model=Sequential([
-      Dense(64,activation='relu',input_shape=(4,)),
-      Dense(32, activation='relu'),
-      Dense(3,activation='softmax')
-  ])
-  
-  model.compile(optimizer=SGD(learning_rate=0.01),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
-  history = model.fit(X_train, y_train, epochs=20,batch_size=batch_size, verbose=0, validation_split=0.1)
-
-  return history
-
-print("Running Gradient Descent...")
-history_gd = run_experiment(len(X_train), 'Gradient Descent (Batch=All)')
-
-print("Running Stochastic Gradient Descent...")
-history_sgd = run_experiment(1, 'Stochastic GD (Batch=1)')
-
-# Plot 1: Loss (Train vs Val) for GD and SGD
-plt.figure(figsize=(12, 5))
-plt.subplot(1, 2, 1)
-plt.plot(history_gd.history['loss'], label='Train Loss')
-plt.plot(history_gd.history['val_loss'], label='Val Loss')
-plt.title('Batch GD Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.subplot(1, 2, 2)
-plt.plot(history_sgd.history['loss'], label='Train Loss')
-plt.plot(history_sgd.history['val_loss'], label='Val Loss')
-plt.title('SGD Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
-
-# Plot 2: Accuracy (Train vs Val) for GD and SGD
-plt.figure(figsize=(12, 5))
-plt.subplot(1, 2, 1)
-plt.plot(history_gd.history['accuracy'], label='Train Acc')
-plt.plot(history_gd.history['val_accuracy'], label='Val Acc')
-plt.title('Batch GD Accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.subplot(1, 2, 2)
-plt.plot(history_sgd.history['accuracy'], label='Train Acc')
-plt.plot(history_sgd.history['val_accuracy'], label='Val Acc')
-plt.title('SGD Accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.show()
-
-# Plot 3: GD vs SGD Loss
-plt.figure(figsize=(10, 6))
-plt.plot(history_gd.history['loss'], label='Gradient Descent')
-plt.plot(history_sgd.history['loss'], label='Stochastic GD')
-plt.title('Gradient Descent vs SGD Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.grid(True)
-plt.show()
-
+print("Best position:", gbest)
+print("Best value:", f(gbest))
     '''),
     5:('''
 Question 5:
-Demonstrate the usage of dropout, gradient clipping and multitask learning with early
-stopping in a neural network training scenario.
+Implementation of Genetic Algorithms
    
 Answer 5:
-#Lab-05
-import numpy as np, matplotlib.pyplot as plt, tensorflow as tf
-from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import EarlyStopping
-from sklearn.datasets import make_classification, load_digits
-from sklearn.model_selection import train_test_split
+import random
+def fitness(x):
+    return x**2  
 
-# Dropout vs Clipping
-X, y = make_classification(1000, 20, n_classes=2)
-X_tr, X_te, y_tr, y_te = train_test_split(X, y)
+population_size = 6
+generations = 20
+mutation_rate = 0.1
 
-def train_model(name, opt, use_drop=False):
-    model = Sequential()
-    model.add(Dense(64, 'relu', input_shape=(20,)))
-    if use_drop: model.add(Dropout(0.2)) 
-    model.add(Dense(1, 'sigmoid'))
+population = [random.randint(-10, 10) for _ in range(population_size)]
 
-    model.compile(optimizer=opt, loss='binary_crossentropy', metrics=['accuracy'])
-    h = model.fit(X_tr, y_tr, epochs=20, validation_data=(X_te, y_te), verbose=0)
-    plt.plot(h.history['val_accuracy'], label=name)
+for _ in range(generations):
+    population = sorted(population, key=fitness, reverse=True)
+    
+    parents = population[:2]
+    
+    new_population = parents.copy()
+    
+    while len(new_population) < population_size:
+        child = (parents[0] + parents[1]) // 2
+        
+        if random.random() < mutation_rate:
+            child += random.randint(-2, 2)
+        
+        new_population.append(child)
+    
+    population = new_population
 
+best = max(population, key=fitness)
 
-plt.figure(figsize=(10,4))
-plt.subplot(1,2,1)
-plt.title("Dropout vs Clipping")
-train_model("Dropout", Adam(), use_drop=True)
-train_model("Clipping", Adam(clipnorm=1.0))
-plt.legend()
-
-
-# Multitask & Early Stopping
-d = load_digits()
-X, y = d.images/16.0, d.target
-y_par = y % 2 
-X_tr, X_te, y_tr, y_te, yp_tr, yp_te = train_test_split(X, y, y_par)
-
-inp = Input((8,8))
-z = Flatten()(inp)
-z = Dense(32, 'relu')(z)
-out_digit = Dense(10, 'softmax')(z) 
-out_parity = Dense(1, 'sigmoid')(z) 
-model = Model(inp, [out_digit, out_parity])
-
-model.compile(optimizer=Adam(), loss=['sparse_categorical_crossentropy', 'binary_crossentropy'])
-es = EarlyStopping(monitor='val_loss', patience=3)
-h = model.fit(X_tr, [y_tr, yp_tr], epochs=30, callbacks=[es],
-validation_split=0.2, verbose=0)
-
-plt.subplot(1,2,2)
-plt.title("Early Stopping Loss")
-plt.plot(h.history['loss'], label='Total Loss')
-plt.plot(h.history['val_loss'], label='Val Loss')
-plt.legend()
-plt.show()
-
+print("Best solution:", best)
+print("Best fitness:", fitness(best))
     '''),
     6:('''
 Question 6:
-Implement a program on Adversarial training, tangent distance, tangent prop and
-tangent classifier. [Any three to be implemented].
+Implementation of Grey Wolf Optimizer
 
 Answer 6:
-
-#Lab-06
 import numpy as np
-import matplotlib.pyplot as plt
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
 
-X, y = make_classification(n_samples=1000, n_features=20, n_classes=2,random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.2)
+def f(x):
+    return x**2   
 
-def augment_data(data, labels, epsilon, mode):
-  if epsilon == 0:
-      return data, labels
+wolves = 5
+iterations = 50
 
-  noise = np.random.randn(*data.shape)
-  perturbation = None # Initialize perturbation
+pos = np.random.uniform(-10, 10, wolves)
 
-  if mode == 'sign':
-      perturbation = np.sign(noise)
-  elif mode == 'normal': # Added condition for 'normal' mode
-      perturbation = noise
-  else:
-      raise ValueError(f"Unknown augmentation mode: {mode}")
+for t in range(iterations):
 
-  x_aug = data + epsilon * perturbation
+    sorted_pos = sorted(pos, key=f)
+    alpha, beta, delta = sorted_pos[:3]
 
-  return np.concatenate([data, x_aug]), np.concatenate([labels,labels])
+    a = 2 - t * (2 / iterations) 
 
-experiments = {
-"Adversarial Training": (0.1, 'sign'),
-"Tangent Prop": (0.1, 'normal'),
-"Tangent Classifier": (0.01, 'normal'),
-"Tangent Distance": (0.0, None)
-}
+    new_pos = []
+    for x in pos:
+        r1, r2 = np.random.rand(), np.random.rand()
+        A1 = 2 * a * r1 - a
+        C1 = 2 * r2
+        D_alpha = abs(C1 * alpha - x)
+        X1 = alpha - A1 * D_alpha
 
-history_dict = {}
-results = {}
-print("Training Models...")
-for name, (eps, mode) in experiments.items():
-  x_tr_aug, y_tr_aug = augment_data(X_train, y_train, eps, mode)
+        r1, r2 = np.random.rand(), np.random.rand()
+        A2 = 2 * a * r1 - a
+        C2 = 2 * r2
+        D_beta = abs(C2 * beta - x)
+        X2 = beta - A2 * D_beta
 
-  model = Sequential([
-    Dense(64, activation='relu', input_shape=(20,)),
-    Dense(1, activation='sigmoid')
-  ])
-  model.compile(optimizer='adam', loss='binary_crossentropy',metrics=['accuracy'])
+        r1, r2 = np.random.rand(), np.random.rand()
+        A3 = 2 * a * r1 - a
+        C3 = 2 * r2
+        D_delta = abs(C3 * delta - x)
+        X3 = delta - A3 * D_delta
 
-  print(f" -> Training {name}...")
-  hist = model.fit(x_tr_aug, y_tr_aug, epochs=20, batch_size=32,verbose=0)
-  history_dict[name] = hist
+        new_x = (X1 + X2 + X3) / 3
+        new_pos.append(new_x)
 
-  loss, acc = model.evaluate(X_test, y_test, verbose=0)
-  results[name] = (loss, acc)
+    pos = np.array(new_pos)
 
-print("\n--- Final Results ---")
-for name, (loss, acc) in results.items():
-  print(f"{name}: Loss = {loss:.4f}, Accuracy = {acc:.4f}")
+best = min(pos, key=f)
 
-plt.figure(figsize=(14, 6))
-
-plt.subplot(1, 2, 1)
-for name, hist in history_dict.items():
-  plt.plot(hist.history['loss'], label=name)
-plt.title('Training Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.grid(True)
-
-plt.subplot(1, 2, 2)
-for name, hist in history_dict.items():
-  plt.plot(hist.history['accuracy'], label=name)
-plt.title('Training Accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.grid(True)
-plt.show()
+print("Best position:", best)
+print("Best value:", f(best))
 
     '''),
     7:('''
     
     Question 7:
-Develop a program to classify the MNIST Dataset using Convolution Neural Network
-[CNN].
+Implementation of Intelligent Droplet
 
 Answer 7:
-#Lab-7
-import matplotlib.pyplot as plt
-import tensorflow as tf
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten,Dense
-from tensorflow.keras.utils import to_categorical
+import numpy as np
+import random
 
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-
-x_train = x_train.reshape(-1, 28, 28, 1).astype('float32') / 255.0
-x_test = x_test.reshape(-1, 28, 28, 1).astype('float32') / 255.0
-
-y_train = to_categorical(y_train, 10)
-y_test = to_categorical(y_test, 10)
-
-model = Sequential([
-  Conv2D(32, kernel_size=(3,3), activation='relu',input_shape=(28,28,1)),
-  MaxPooling2D(pool_size=(2,2)),
-  Flatten(),
-  Dense(128, activation='relu'),
-  Dense(10, activation='softmax')
+dist = np.array([
+    [0, 2, 9, 10],
+    [1, 0, 6, 4],
+    [15, 7, 0, 8],
+    [6, 3, 12, 0]
 ])
 
-model.compile(optimizer='adam', loss='categorical_crossentropy',metrics=['accuracy'])
-print("Training CNN...")
-history = model.fit(x_train, y_train, epochs=3, batch_size=64,validation_split=0.1)
-predictions = model.predict(x_test)
-predicted_labels= [tf.argmax(prediction).numpy() for prediction in predictions]
+n = len(dist)
 
-plt.plot(history.history['accuracy'], label='Accuracy')
-plt.plot(history.history['val_accuracy'], label='Val Accuracy')
-plt.title('CNN Accuracy')
-plt.legend()
-plt.show()
+drops = 5
+iterations = 50
 
-plt.plot(history.history['loss'], label='loss')
-plt.plot(history.history['val_loss'], label='Val Loss')
-plt.title('CNN Loss')
-plt.legend()
-plt.show()
+soil = np.ones((n, n)) * 0.1
 
-plt.figure(figsize=(10, 4))
-num_images = 3
-for i in range(num_images):
-  plt.subplot(1,num_images, i + 1)
-  plt.imshow(x_test[i].reshape(28,28), cmap="gray")
-  plt.title(f"Predicted: {predicted_labels[i]}, True:{tf.argmax(y_test[i]).numpy()}")
-  plt.axis('off')
-  plt.show()
+def choose_next(curr, visited):
+    probs = []
+    for j in range(n):
+        if j not in visited:
+            probs.append(1 / (soil[curr][j] + 1e-6))  # less soil = better
+        else:
+            probs.append(0)
 
+    probs = np.array(probs)
+    probs = probs / probs.sum()
+    return np.random.choice(range(n), p=probs)
+
+def path_cost(path):
+    return sum(dist[path[i]][path[i+1]] for i in range(len(path)-1)) + dist[path[-1]][path[0]]
+
+best_path = None
+best_cost = float('inf')
+
+for _ in range(iterations):
+    all_paths = []
+
+    for _ in range(drops):
+        start = random.randint(0, n-1)
+        path = [start]
+
+        while len(path) < n:
+            next_city = choose_next(path[-1], path)
+            path.append(next_city)
+
+        cost = path_cost(path)
+        all_paths.append((path, cost))
+
+        if cost < best_cost:
+            best_cost = cost
+            best_path = path
+
+    for path, cost in all_paths:
+        for i in range(len(path)-1):
+            soil[path[i]][path[i+1]] = max(soil[path[i]][path[i+1]], 1e-6)
+
+print("Best Path:", best_path)
+print("Best Cost:", best_cost)
+       
     '''),
     8:('''
 Question 8:
-Design a python program for Sentiment Analysis using Recurrent Neural Networks
-(RNN).
+Implementation of Firefly Algorithm
 
 Answer 8:
+import numpy as np
 
-#Lab-08
-import matplotlib.pyplot as plt
-from tensorflow.keras.datasets import imdb
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, SimpleRNN, Dense
+def f(x):
+    return x**2   
 
-max_features = 10000
-maxlen = 100
-print("Loading IMDB data...")
-(x_train, y_train), (x_test, y_test) =imdb.load_data(num_words=max_features)
+fireflies = 5
+iterations = 50
+alpha = 0.2   
+beta0 = 1     
+gamma = 1     
 
-x_train = pad_sequences(x_train, maxlen=maxlen)
-x_test = pad_sequences(x_test, maxlen=maxlen)
+pos = np.random.uniform(-10, 10, fireflies)
 
-model = Sequential([
-    Embedding(max_features, 50, input_length=maxlen),
-    SimpleRNN(64, dropout=0.2, recurrent_dropout=0.2),
-    Dense(1, activation='sigmoid')
-])
+for _ in range(iterations):
+    for i in range(fireflies):
+        for j in range(fireflies):
+            if f(pos[j]) < f(pos[i]):
+                r = abs(pos[i] - pos[j])
 
-model.compile(optimizer='adam', loss='binary_crossentropy',metrics=['accuracy'])
-history = model.fit(x_train, y_train, epochs=5, batch_size=128,validation_data=(x_test, y_test), verbose=2)
+                beta = beta0 * np.exp(-gamma * r**2)
+       
+                pos[i] += beta * (pos[j] - pos[i]) + alpha * np.random.randn()
 
-loss, acc = model.evaluate(x_test, y_test, verbose=0)
-print("Test Accuracy:", acc)
+best = min(pos, key=f)
 
-plt.figure(figsize=(10,4))
-plt.subplot(1,2,1);
-plt.plot(history.history['accuracy']);
-plt.plot(history.history['val_accuracy']);
-plt.title("Accuracy")
-
-plt.subplot(1,2,2);
-plt.plot(history.history['loss']);
-plt.plot(history.history['val_loss']);
-plt.title("Loss")
-plt.tight_layout();
-plt.show()
+print("Best position:", best)
+print("Best value:", f(best))
 
     '''),
     9:('''
-Develop a GRU based term stock price prediction model for tickers in yahoo finance.
+Implementation of Artificial Bee Colony
 
 Answer 9:
-
-#Lab-09
-import yfinance as yf
 import numpy as np
-import matplotlib.pyplot as plt
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import GRU, Dense
+def f(x):
+    return x**2   # Minimum at x = 0
 
-df = yf.download("AAPL", period="5y")["Close"].values.reshape(-1,1)
-mn, mx = df.min(), df.max()
-data = (df - mn) / (mx - mn)
+food_sources = 5
+iterations = 50
+limit = 10   # abandonment limit
 
-X, y = [], []
-seq_len = 60
-for i in range(len(data) - seq_len):
-    X.append(data[i : i+seq_len])
-    y.append(data[i+seq_len])
+pos = np.random.uniform(-10, 10, food_sources)
+fitness = np.array([f(x) for x in pos])
+trial = np.zeros(food_sources)
 
-X, y = np.array(X), np.array(y)
-
-model = Sequential([
-    GRU(64, input_shape=(seq_len, 1)),
-    Dense(1)
-])
-
-model.compile(optimizer='adam', loss='mse')
-model.fit(X, y, epochs=5, batch_size=32, verbose=1)
+for _ in range(iterations):
 
 
-pred = model.predict(X) * (mx - mn) + mn
-actual = y * (mx - mn) + mn
-plt.plot(actual, label="Actual Price")
-plt.plot(pred, label="Predicted Price")
-plt.legend()
-plt.show()
+    for i in range(food_sources):
+        k = np.random.randint(food_sources)
+        phi = np.random.uniform(-1, 1)
 
-    '''),
-    10:('''
-Implement stock market prediction using Long Short-Term Memory (LSTM).
+        new = pos[i] + phi * (pos[i] - pos[k])
 
-Answer 10:
-#LAb-10
-import yfinance as yf
-import numpy as np
-import matplotlib.pyplot as plt
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
+        if f(new) < fitness[i]:
+            pos[i] = new
+            fitness[i] = f(new)
+            trial[i] = 0
+        else:
+            trial[i] += 1
 
-df = yf.download("AAPL", period="5y")["Close"].values.reshape(-1,1)
+    prob = fitness / fitness.sum()
+    for i in range(food_sources):
+        if np.random.rand() < prob[i]:
+            k = np.random.randint(food_sources)
+            phi = np.random.uniform(-1, 1)
 
-mn, mx = df.min(), df.max()
-data = (df - mn) / (mx - mn)
+            new = pos[i] + phi * (pos[i] - pos[k])
 
-X, y = [], []
-seq_len = 60 
-for i in range(len(data) - seq_len):
-    X.append(data[i : i+seq_len])
-    y.append(data[i+seq_len])
+            if f(new) < fitness[i]:
+                pos[i] = new
+                fitness[i] = f(new)
+                trial[i] = 0
+            else:
+                trial[i] += 1
 
-X, y = np.array(X), np.array(y)
+    for i in range(food_sources):
+        if trial[i] > limit:
+            pos[i] = np.random.uniform(-10, 10)
+            fitness[i] = f(pos[i])
+            trial[i] = 0
 
-model = Sequential([
-    LSTM(64, input_shape=(seq_len, 1)),
-    Dense(1) 
-])
+best = pos[np.argmin(fitness)]
 
-model.compile(optimizer='adam', loss='mse')
-print("Training LSTM...")
-model.fit(X, y, epochs=5, batch_size=32, verbose=1)
+print("Best position:", best)
+print("Best value:", f(best))
 
-pred = model.predict(X) * (mx - mn) + mn
-actual = y * (mx - mn) + mn
-plt.plot(actual, label="Actual Price")
-plt.plot(pred, label="Predicted Price")
-plt.title("Stock Prediction (LSTM)")
-plt.legend()
-plt.show()
     ''')
 }
 
