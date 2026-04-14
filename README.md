@@ -1,74 +1,86 @@
 # codeprinter
 
-Tiny utility package for keeping your lab solutions in one place and importing them easily from anywhere in the world.
+`codeprinter` is a lightweight Python package for storing and retrieving numbered answers (for example, lab/program solutions) from a central mapping.
 
-## 🌍 Global Installation
+## Features
 
-Once published to PyPI, you (or anyone) can install it globally using:
+- Retrieve an answer by question number with `ques()`
+- Register or override answers at runtime with `register()`
+- Get all resolved answers with `all_questions()`
+- Print available question numbers with `all_ques()`
+- Supports both static values and callables (callables are executed on access)
+
+## Installation
+
+Install from PyPI:
 
 ```bash
 pip install codeprinter2
 ```
 
-This will automatically install the latest version of the package from PyPI, so it can be used from any project or environment.
-
----
-
-## 📦 Local Setup (for development)
-
-If you’re developing the package locally, install it in editable mode:
+For local development (editable install):
 
 ```bash
-cd /path/to/codeprinter
+cd /path/to/code-printer
 pip install -e .
 ```
 
-This allows you to edit the code and immediately test changes without rebuilding.
-
----
-
-## 🧠 Usage
-
-After installation, simply import it anywhere in your Python code:
+## Quick Start
 
 ```python
 import codeprinter as cp
 
+# Get answer for question 1
 print(cp.ques(1))
+
+# Provide a fallback default instead of raising KeyError
+print(cp.ques(999, default="Not available"))
+
+# Register or override an answer at runtime
+cp.register(10, "print('Hello from question 10')")
+print(cp.ques(10))
+
+# Register a callable answer (executed when requested)
+cp.register(11, lambda: 6 * 7)
+print(cp.ques(11))  # 42
+
+# Fetch all answers (with callables resolved)
+print(cp.all_questions())
+
+# Print available question numbers
+cp.all_ques()
 ```
 
-This will retrieve the answer or code snippet linked to that question number.
+## API
 
----
+### `ques(question_number: int, *, default: Any | None = None) -> Any`
+Returns the stored answer for `question_number`.
 
-## 🛠️ Add or Update Answers
+- If the stored answer is callable, it is executed and its return value is returned.
+- If the question number is missing and `default` is provided, `default` is returned.
+- If the question number is missing and `default` is not provided, a `KeyError` is raised.
 
-You can add new entries by editing `codeprinter/_answers.py`:
+### `register(question_number: int, answer: Answer) -> None`
+Registers or overrides an answer in memory at runtime.
 
-```python
-ANSWERS = {
-    1: "print('Hello world')",
-    2: lambda: 42,
-}
-```
+### `all_questions() -> dict[int, Any]`
+Returns a new dictionary of all question-answer pairs with callable answers resolved.
 
-Each entry maps a **question number** to a **solution**, which can be:
+### `all_ques() -> None`
+Prints the list of available question numbers.
 
-* a string
-* a dictionary
-* or even a callable (function/lambda)
+## Editing the built-in answer bank
 
-Callables are automatically executed when retrieved.
+Built-in entries are defined in:
 
----
+- `codeprinter/_answers.py`
 
-## 🧾 License
+You can modify the `ANSWERS` mapping directly if you want package-level defaults to change.
+
+## Requirements
+
+- Python 3.8+
+
+## License
 
 MIT License © 2025 Shriyans Nayak
-
----
-
-## 📬 Author
-
-**Shriyans Nayak**
-
