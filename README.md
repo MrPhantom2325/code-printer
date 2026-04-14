@@ -1,4 +1,4 @@
-# codeprinter
+# CodePrinter
 
 `codeprinter` is a lightweight Python package for storing and retrieving numbered answers (for example, lab/program solutions) from a central mapping.
 
